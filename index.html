@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SE210 – Software Evolution & Maintenance Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: white;
+      padding: 20px 24px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      letter-spacing: 0.03em;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      font-size: 0.95rem;
+      opacity: 0.95;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .controls-left {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 0.9rem;
+    }
+
+    button {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+    }
+
+    button.primary {
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 1px 4px rgba(37,99,235,0.45);
+    }
+
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .stats {
+      font-size: 0.85rem;
+      color: #4b5563;
+    }
+
+    .questions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .question-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 14px 16px 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-left: 4px solid #6366f1;
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .question-text {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .question-meta {
+      font-size: 0.75rem;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+
+    .options {
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #111827;
+    }
+
+    .option input {
+      margin-right: 6px;
+      cursor: pointer;
+    }
+
+    .feedback {
+      font-size: 0.85rem;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px dashed #e5e7eb;
+    }
+
+    .feedback.correct {
+      color: #059669;
+    }
+
+    .feedback.incorrect {
+      color: #b91c1c;
+    }
+
+    .feedback .explanation {
+      display: block;
+      margin-top: 3px;
+      color: #374151;
+    }
+
+    .overall-result {
+      margin-top: 18px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      background: #e5e7eb;
+      color: #374151;
+      margin-left: 4px;
+    }
+
+    .badge.tf {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge.mcq {
+      background: #dbebff;
+      color: #1d4ed8;
+    }
+
+    @media (max-width: 640px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .controls-left {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>SE210 – Software Evolution &amp; Maintenance Quiz</h1>
+  <p>Lectures 1–4 • MCQ &amp; True/False • Software Evolution, Maintenance, SPE, Laws, COTS, Reuse &amp; Models</p>
+</header>
+
+<main>
+  <section class="controls">
+    <div class="controls-left">
+      <div>
+        <label for="lectureFilter">Filter by Lecture:</label>
+        <select id="lectureFilter">
+          <option value="all">All Lectures</option>
+          <option value="1">Lecture 1 – Intro &amp; Concepts</option>
+          <option value="2">Lecture 2 – Reuse &amp; Maintenance Taxonomies</option>
+          <option value="3">Lecture 3 – SPE &amp; Laws of Evolution</option>
+          <option value="4">Lecture 4 – COTS &amp; Maintenance Models</option>
+        </select>
+      </div>
+      <div class="stats" id="statsText"></div>
+    </div>
+    <div>
+      <button class="primary" id="checkBtn">Check Answers</button>
+      <button class="secondary" id="resetBtn">Reset</button>
+    </div>
+  </section>
+
+  <section class="questions-container" id="questionsContainer">
+    <!-- Questions will be injected here -->
+  </section>
+
+  <div id="overallResult" class="overall-result" style="display:none;"></div>
+</main>
+
+<script>
+  // ========= QUESTION BANK =========
+  // type: "mcq" or "tf"
+  // lecture: 1..4
+
+  const questions = [
+    // === LECTURE 1 ===
+    {
+      id: 1,
+      lecture: 1,
+      type: "mcq",
+      question: "Which statement BEST captures the difference between software evolution and software maintenance?",
+      options: [
+        "Evolution fixes bugs after delivery, while maintenance adds new features.",
+        "Evolution focuses on adding or changing functionality, while maintenance focuses on keeping the system working and fixing failures.",
+        "Evolution is only done during initial development, while maintenance happens before release.",
+        "Evolution is about hardware upgrades, while maintenance is about software upgrades."
+      ],
+      correctIndex: 1,
+      explanation: "In your lectures, evolution is linked to changes in requirements and new functionality, whereas maintenance preserves the system from failure or decline by fixing bugs and keeping it running."
+    },
+    {
+      id: 2,
+      lecture: 1,
+      type: "mcq",
+      question: "In the HR system example where vacation balance is calculated incorrectly and must be fixed, this activity is classified as:",
+      options: [
+        "Software evolution – adaptive change",
+        "Software evolution – perfective change",
+        "Software maintenance – corrective maintenance",
+        "Software maintenance – preventive maintenance"
+      ],
+      correctIndex: 2,
+      explanation: "Fixing an incorrect computation is a classic example of corrective maintenance."
+    },
+    {
+      id: 3,
+      lecture: 1,
+      type: "mcq",
+      question: "Adding a new mobile wallet payment method (e.g., Vodafone Cash) to an online store is an example of:",
+      options: [
+        "Corrective maintenance",
+        "Evolution / perfective change to support new business needs",
+        "Preventive maintenance",
+        "Reengineering"
+      ],
+      correctIndex: 1,
+      explanation: "The payment system already works, but you extend it to compete and support new functionality, which is evolution/perfective change."
+    },
+    {
+      id: 4,
+      lecture: 1,
+      type: "mcq",
+      question: "Lehman’s laws mainly concern E-type systems. Which of the following is an example of an E-type system?",
+      options: [
+        "A simple program that computes the greatest common divisor of two integers.",
+        "A standalone calculator app with no real users.",
+        "A university management system used by staff and students.",
+        "A program that only tests sorting algorithms."
+      ],
+      correctIndex: 2,
+      explanation: "E-type programs are embedded in the real world, have human users, and evolve with their environment, like a university management or HR system."
+    },
+    {
+      id: 5,
+      lecture: 1,
+      type: "mcq",
+      question: "Which Lehman law states: “A system will become progressively more complex, unless work is done to explicitly reduce the complexity”?",
+      options: [
+        "Continuing change",
+        "Conservation of familiarity",
+        "Increasing complexity",
+        "Declining quality"
+      ],
+      correctIndex: 2,
+      explanation: "This is the Second Law – Increasing complexity."
+    },
+    {
+      id: 6,
+      lecture: 1,
+      type: "mcq",
+      question: "Which activity below is MOST aligned with the law of “Continuing growth”?",
+      options: [
+        "Fixing defects after every release.",
+        "Continuously increasing the functional content of the system to maintain user satisfaction.",
+        "Refactoring internal code structure without changing functionality.",
+        "Pausing all development to stabilize documentation."
+      ],
+      correctIndex: 1,
+      explanation: "Continuing growth (6th law) says we must increase functional content over time to keep users satisfied."
+    },
+    {
+      id: 7,
+      lecture: 1,
+      type: "tf",
+      question: "According to Bennett and Xu, all post-delivery support activities are grouped under the term 'maintenance'.",
+      correctAnswer: true,
+      explanation: "They use the term maintenance for all post-delivery support, and evolution for perfective modifications driven by requirement changes."
+    },
+    {
+      id: 8,
+      lecture: 1,
+      type: "tf",
+      question: "Software maintenance in the lectures is defined as replacing physically worn-out parts of the program, similar to hardware maintenance.",
+      correctAnswer: false,
+      explanation: "Software does not physically wear out; maintenance moves software from an erroneous state to a correct one by fixing bugs and adapting it."
+    },
+
+    // === LECTURE 2 ===
+    {
+      id: 9,
+      lecture: 2,
+      type: "mcq",
+      question: "Which of the following BEST describes software reengineering, as given in the lecture?",
+      options: [
+        "Writing a new system from scratch with no relation to the old system.",
+        "Analyzing and transforming an existing system to a new improved form with longer lifespan.",
+        "Only documenting an existing legacy system.",
+        "Running performance tests on a newly developed system."
+      ],
+      correctIndex: 1,
+      explanation: "Reengineering analyzes and transforms an existing system to a better form for improved efficiency, reliability, and maintainability."
+    },
+    {
+      id: 10,
+      lecture: 2,
+      type: "mcq",
+      question: "Which formula was given for reengineering in the lecture?",
+      options: [
+        "Reengineering = Forward engineering + Coding",
+        "Reengineering = Reverse engineering + Documentation",
+        "Reengineering = Reverse engineering + Change + Forward engineering",
+        "Reengineering = Maintenance + Testing"
+      ],
+      correctIndex: 2,
+      explanation: "The lecture expresses reengineering as the combination of reverse engineering, change/alteration, and forward engineering."
+    },
+    {
+      id: 11,
+      lecture: 2,
+      type: "mcq",
+      question: "A legacy system in the lecture is best described as:",
+      options: [
+        "Any new cloud-based application.",
+        "An old but still valuable system used by the organization, often in phase-out stage.",
+        "A system that is open source and maintained by the community.",
+        "Any system built with object-oriented programming."
+      ],
+      correctIndex: 1,
+      explanation: "Legacy systems are old, still valuable systems that the organization often depends on and may be in the phase-out stage of evolution."
+    },
+    {
+      id: 12,
+      lecture: 2,
+      type: "mcq",
+      question: "Which of the following is NOT a solution/option for managing legacy systems mentioned in the lecture?",
+      options: [
+        "Freeze (no further work on the system)",
+        "Outsource maintenance",
+      "Discard and redevelop from scratch",
+        "Replace the system with manual paper-based processes only"
+      ],
+      correctIndex: 3,
+      explanation: "Freeze, outsource, discard & redevelop, wrap, and migrate are options. Reverting permanently to pure paper-based processes is not presented as a strategy."
+    },
+    {
+      id: 13,
+      lecture: 2,
+      type: "mcq",
+      question: "Which two main techniques are used in impact analysis?",
+      options: [
+        "Unit testing and system testing",
+        "Traceability analysis and dependency (source-code) analysis",
+        "Profiling and benchmarking",
+        "Reengineering and refactoring"
+      ],
+      correctIndex: 1,
+      explanation: "Impact analysis techniques are classified into traceability analysis and dependency/source-code analysis."
+    },
+    {
+      id: 14,
+      lecture: 2,
+      type: "mcq",
+      question: "Which statement about refactoring is TRUE according to the lecture?",
+      options: [
+        "Refactoring always adds new functionality to the system.",
+        "Refactoring changes observable behavior while keeping internal structure the same.",
+        "Refactoring changes the internal structure of the code without changing observable behavior.",
+        "Refactoring is only done at the requirements level."
+      ],
+      correctIndex: 2,
+      explanation: "Refactoring improves the internal code structure (maintainability) while preserving observable behavior."
+    },
+    {
+      id: 15,
+      lecture: 2,
+      type: "tf",
+      question: "Top-down program comprehension starts from a general hypothesis about the system (e.g., 'this is a restaurant system') and then searches for code that confirms or refines that hypothesis.",
+      correctAnswer: true,
+      explanation: "In the lecture’s food-ordering example, top-down comprehension begins with a high-level idea and then navigates to supporting code elements."
+    },
+    {
+      id: 16,
+      lecture: 2,
+      type: "tf",
+      question: "High cohesion and loose coupling both increase the reusability of software components.",
+      correctAnswer: true,
+      explanation: "The lecture lists high cohesion and loose coupling as key properties that make components more reusable."
+    },
+
+    // === LECTURE 3 ===
+    {
+      id: 17,
+      lecture: 3,
+      type: "mcq",
+      question: "Which of the following pairs correctly matches the TWO broad approaches to studying software evolution?",
+      options: [
+        "Refactoring & Reengineering",
+        "Explanatory (What/Why) & Process improvement (How)",
+        "Reactive & Proactive",
+        "Corrective & Preventive"
+      ],
+      correctIndex: 1,
+      explanation: "The lecture divides evolution studies into Explanatory (scientific, What/Why) and Process improvement (engineering, How)."
+    },
+    {
+      id: 18,
+      lecture: 3,
+      type: "mcq",
+      question: "In Lehman’s SPE taxonomy, an S-type (Specified) program is characterized by:",
+      options: [
+        "Being embedded in the real world and changing as the world changes.",
+        "Having all important properties formally and completely defined, with correctness to the specification as the main acceptability criterion.",
+        "Being based on a practical abstraction of a problem with incomplete specification.",
+        "Being open-source and developed by volunteers."
+      ],
+      correctIndex: 1,
+      explanation: "S-type programs have fully defined specifications and are judged only by correctness to those specs."
+    },
+    {
+      id: 19,
+      lecture: 3,
+      type: "mcq",
+      question: "A chess-playing program that is repeatedly tuned to play better, although the basic problem remains the same, is an example of:",
+      options: [
+        "S-type program",
+        "P-type program",
+        "E-type program",
+        "Legacy system"
+      ],
+      correctIndex: 1,
+      explanation: "The lecture uses a chess program as an example of a P-type (Problem) program, based on a practical abstraction rather than fully specified requirements."
+    },
+    {
+      id: 20,
+      lecture: 3,
+      type: "mcq",
+      question: "Which of the following is a symptom of software product aging mentioned in the lecture?",
+      options: [
+        "Automatic memory cleanup",
+        "Pollution (unused modules not involved in delivering business functions)",
+        "Perfect documentation",
+        "Full test coverage"
+      ],
+      correctIndex: 1,
+      explanation: "Pollution is listed as a symptom of aging, referring to unused modules that remain in the system."
+    },
+    {
+      id: 21,
+      lecture: 3,
+      type: "mcq",
+      question: "Which statement about coupling in the school system example is TRUE?",
+      options: [
+        "High coupling between the Student System and Certificate System makes the system easier to change.",
+        "Low coupling ensures that changes in one system have minimal impact on the other.",
+        "Coupling only refers to physical network connections between servers.",
+        "Coupling is irrelevant to software aging."
+      ],
+      correctIndex: 1,
+      explanation: "Low coupling, via APIs instead of direct DB access, lets each system evolve independently."
+    },
+    {
+      id: 22,
+      lecture: 3,
+      type: "mcq",
+      question: "In the onion model of FOSS development, which layer is responsible for reporting defects and helping with testing?",
+      options: [
+        "Core team at the center",
+        "Contributing developers",
+        "Active users in the outer rings",
+        "Commercial vendors"
+      ],
+      correctIndex: 2,
+      explanation: "Active users in the onion model take ownership of system testing and defect reporting."
+    },
+    {
+      id: 23,
+      lecture: 3,
+      type: "tf",
+      question: "Software product aging refers to quality degradation of code and documentation due to frequent changes over the lifecycle.",
+      correctAnswer: true,
+      explanation: "The lecture distinguishes software process execution aging from software product aging, the latter being about code/document quality decline."
+    },
+    {
+      id: 24,
+      lecture: 3,
+      type: "tf",
+      question: "The lecture concludes that all of Lehman’s laws fit perfectly for large-scale FOSS systems with no exceptions.",
+      correctAnswer: false,
+      explanation: "Robles and collaborators found that some laws (e.g., 3, 4, 5) do not fit large-scale FOSS systems perfectly."
+    },
+
+    // === LECTURE 4 ===
+    {
+      id: 25,
+      lecture: 4,
+      type: "mcq",
+      question: "A Commercial Off-The-Shelf (COTS) component is defined in the lecture as:",
+      options: [
+        "Any source-code file that can be edited freely by the maintainer.",
+        "A unit of composition with contractually specified interfaces and explicit context dependencies, deployable independently and composed by third parties.",
+        "Any open-source library downloaded from the internet.",
+        "A component that must be rewritten for each customer."
+      ],
+      correctIndex: 1,
+      explanation: "The formal definition in the lecture emphasizes contracts, explicit dependencies, independent deployment, and third-party composition."
+    },
+    {
+      id: 26,
+      lecture: 4,
+      type: "mcq",
+      question: "Which of the following correctly matches wrapper, glue, and tailoring code in a COTS-based sales system?",
+      options: [
+        "Wrapper integrates payment and inventory; glue hides data formats; tailoring modifies COTS source code.",
+        "Wrapper converts data formats/interfaces; glue connects different components; tailoring adds extra behavior without modifying COTS source code.",
+        "Wrapper adds business rules; glue changes database schema; tailoring rewrites the entire billing component.",
+        "Wrapper is documentation; glue is test code; tailoring is database triggers."
+      ],
+      correctIndex: 1,
+      explanation: "The lecture states: wrapper isolates components and adapts interfaces, glue connects components, and tailoring adds new behavior without changing COTS source code."
+    },
+    {
+      id: 27,
+      lecture: 4,
+      type: "mcq",
+      question: "Which of the following is NOT one of the main reasons why maintenance of COTS-based systems is difficult, as listed in the lecture?",
+      options: [
+        "Frozen functionality",
+        "Incompatibility of upgrades",
+        "Trojan horses",
+        "Perfect documentation of all components"
+      ],
+      correctIndex: 3,
+      explanation: "Frozen functionality, incompatibility of upgrades, Trojan horses, and unreliable COTS are listed. Perfect documentation would actually make it easier."
+    },
+    {
+      id: 28,
+      lecture: 4,
+      type: "mcq",
+      question: "In the reuse models, the Quick Fix model is characterized by:",
+      options: [
+        "Redesigning the system from requirements down to code for each change.",
+        "Rapidly changing the source code first, then updating documents, often with little upfront analysis.",
+        "Building a new system solely from repository components.",
+        "Never modifying existing code."
+      ],
+      correctIndex: 1,
+      explanation: "Quick Fix modifies code quickly and then documentation, usually without deep impact analysis or regression testing."
+    },
+    {
+      id: 29,
+      lecture: 4,
+      type: "mcq",
+      question: "Which sequence correctly lists the five stages in Rajlich & Bennett’s staged model of maintenance and evolution for CSS?",
+      options: [
+        "Evolution → Servicing → Initial development → Phase-out → Closedown",
+        "Initial development → Evolution → Servicing → Phase-out → Closedown",
+        "Initial development → Servicing → Evolution → Phase-out → Closedown",
+        "Initial development → Evolution → Phase-out → Servicing → Closedown"
+      ],
+      correctIndex: 1,
+      explanation: "The model divides the lifespan into: Initial development, Evolution, Servicing, Phase-out, and Closedown."
+    },
+    {
+      id: 30,
+      lecture: 4,
+      type: "mcq",
+      question: "In the Change Mini-Cycle model, which phase is responsible for checking the system after a change to ensure integrity is not compromised?",
+      options: [
+        "Change request",
+        "Analyze and plan change",
+        "Implement change (including refactoring & change propagation)",
+        "Verify and validate"
+      ],
+      correctIndex: 3,
+      explanation: "Verify and validate includes code review, regression testing, and other tests to ensure the system remains correct."
+    },
+    {
+      id: 31,
+      lecture: 4,
+      type: "tf",
+      question: "In the Change Mini-Cycle model, a change request (CR) may come either as a defect report or an enhancement request.",
+      correctAnswer: true,
+      explanation: "The lecture defines a CR as either a defect report (incorrect behavior) or an enhancement request (change to requirements/functionality/quality)."
+    },
+    {
+      id: 32,
+      lecture: 4,
+      type: "tf",
+      question: "Incompatibility of COTS upgrades can sometimes be handled by building wrappers or rewriting glue code instead of changing all components.",
+      correctAnswer: true,
+      explanation: "The lecture suggests using wrappers and modified glue code to isolate incompatible new versions and avoid system-wide changes."
+    }
+  ];
+
+  // ========= RENDERING & LOGIC =========
+
+  const questionsContainer = document.getElementById("questionsContainer");
+  const lectureFilter = document.getElementById("lectureFilter");
+  const statsText = document.getElementById("statsText");
+  const overallResult = document.getElementById("overallResult");
+  const checkBtn = document.getElementById("checkBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  function getFilteredQuestions() {
+    const value = lectureFilter.value;
+    if (value === "all") return questions;
+    const lectureNum = parseInt(value, 10);
+    return questions.filter(q => q.lecture === lectureNum);
+  }
+
+  function renderQuestions() {
+    const qs = getFilteredQuestions();
+    questionsContainer.innerHTML = "";
+
+    qs.forEach((q, index) => {
+      const card = document.createElement("article");
+      card.className = "question-card";
+      card.dataset.questionId = q.id;
+
+      const header = document.createElement("div");
+      header.className = "question-header";
+
+      const text = document.createElement("div");
+      text.className = "question-text";
+      text.textContent = `${index + 1}. ${q.question}`;
+
+      const meta = document.createElement("div");
+      meta.className = "question-meta";
+      const typeBadge = q.type === "tf" ? "tf" : "mcq";
+      meta.innerHTML =
+        `Lecture ${q.lecture}` +
+        ` <span class="badge ${typeBadge}">${q.type === "tf" ? "T/F" : "MCQ"}</span>`;
+
+      header.appendChild(text);
+      header.appendChild(meta);
+      card.appendChild(header);
+
+      const optionsDiv = document.createElement("div");
+      optionsDiv.className = "options";
+
+      const groupName = `q_${q.id}`;
+
+      if (q.type === "mcq") {
+        q.options.forEach((opt, idx) => {
+          const label = document.createElement("label");
+          label.className = "option";
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = groupName;
+          input.value = idx.toString();
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(opt));
+          optionsDiv.appendChild(label);
+        });
+      } else {
+        ["True", "False"].forEach((textOpt, idx) => {
+          const label = document.createElement("label");
+          label.className = "option";
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = groupName;
+          input.value = textOpt.toLowerCase();
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(textOpt));
+          optionsDiv.appendChild(label);
+        });
+      }
+
+      card.appendChild(optionsDiv);
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback";
+      feedback.style.display = "none";
+      card.appendChild(feedback);
+
+      questionsContainer.appendChild(card);
+    });
+
+    statsText.textContent = `${qs.length} questions shown`;
+    overallResult.style.display = "none";
+  }
+
+  function checkAnswers() {
+    const qs = getFilteredQuestions();
+    let total = qs.length;
+    let attempted = 0;
+    let correctCount = 0;
+
+    qs.forEach(q => {
+      const card = questionsContainer.querySelector(`[data-question-id="${q.id}"]`);
+      if (!card) return;
+
+      const feedback = card.querySelector(".feedback");
+      const selected = card.querySelector(`input[name="q_${q.id}"]:checked`);
+      feedback.style.display = "block";
+
+      if (!selected) {
+        feedback.className = "feedback incorrect";
+        feedback.innerHTML = `<strong>Not answered.</strong> <span class="explanation">${q.explanation}</span>`;
+        return;
+      }
+
+      attempted++;
+      let isCorrect = false;
+
+      if (q.type === "mcq") {
+        const selectedIndex = parseInt(selected.value, 10);
+        isCorrect = selectedIndex === q.correctIndex;
+      } else {
+        const userVal = selected.value === "true";
+        isCorrect = userVal === q.correctAnswer;
+      }
+
+      if (isCorrect) {
+        correctCount++;
+        feedback.className = "feedback correct";
+        feedback.innerHTML = `<strong>Correct ✔</strong> <span class="explanation">${q.explanation}</span>`;
+      } else {
+        feedback.className = "feedback incorrect";
+        let correctText = "";
+        if (q.type === "mcq") {
+          correctText = q.options[q.correctIndex];
+        } else {
+          correctText = q.correctAnswer ? "True" : "False";
+        }
+        feedback.innerHTML =
+          `<strong>Incorrect ✘</strong> (Correct: <em>${correctText}</em>)` +
+          `<span class="explanation">${q.explanation}</span>`;
+      }
+    });
+
+    const percentage = total === 0 ? 0 : Math.round((correctCount / total) * 100);
+    overallResult.style.display = "block";
+    overallResult.textContent =
+      `Score: ${correctCount} / ${total} correct (${percentage}%). ` +
+      `Attempted: ${attempted} questions.`;
+  }
+
+  function resetQuiz() {
+    const inputs = questionsContainer.querySelectorAll("input[type=radio]");
+    inputs.forEach(inp => inp.checked = false);
+
+    const feedbacks = questionsContainer.querySelectorAll(".feedback");
+    feedbacks.forEach(fb => {
+      fb.style.display = "none";
+      fb.textContent = "";
+    });
+
+    overallResult.style.display = "none";
+  }
+
+  lectureFilter.addEventListener("change", () => {
+    renderQuestions();
+  });
+
+  checkBtn.addEventListener("click", checkAnswers);
+  resetBtn.addEventListener("click", resetQuiz);
+
+  // Initial render
+  renderQuestions();
+</script>
+</body>
+</html>
